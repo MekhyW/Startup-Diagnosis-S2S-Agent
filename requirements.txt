@@ -1,0 +1,9 @@
+livekit-agents[openai, silero, elevenlabs]
+livekit-plugins-noise-cancellation
+livekit-plugins-turn-detector
+fastapi
+uvicorn
+python-dotenv
+httpx
+ipython
+aiohttp>=3.12
