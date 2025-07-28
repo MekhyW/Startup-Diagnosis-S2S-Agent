@@ -7,3 +7,4 @@ python-dotenv
 httpx
 ipython
 aiohttp>=3.12
+jinja2>=3.1.0
