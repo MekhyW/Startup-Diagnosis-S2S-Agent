@@ -1,4 +1,5 @@
 import logging
+import os
 from dotenv import load_dotenv
 from livekit.agents import Agent, AgentSession, JobContext, JobProcess, RoomInputOptions, RoomOutputOptions, WorkerOptions, cli, metrics
 from livekit.agents.voice import MetricsCollectedEvent
@@ -7,14 +8,12 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 logger = logging.getLogger("agent")
 load_dotenv(".env.local")
 
+with open("system_prompt.txt", "r", encoding='utf-8') as f:
+    system_prompt = f.read()
+
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(
-            instructions="""You are a helpful voice AI assistant.
-            You eagerly assist users with their questions by providing information from your extensive knowledge.
-            Your responses are concise, to the point, and without any complex formatting or punctuation.
-            You are curious, friendly, and have a sense of humor.""",
-        )
+        super().__init__(instructions=system_prompt)
 
 def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
@@ -22,9 +21,9 @@ def prewarm(proc: JobProcess):
 async def entrypoint(ctx: JobContext):
     ctx.log_context_fields = { "room": ctx.room.name }
     session = AgentSession(
-        llm=openai.LLM(model="gpt-4o-mini"),
+        llm=openai.LLM(model="gpt-4.1-nano"),
         stt=openai.STT(model="whisper-1"),
-        tts=elevenlabs.TTS(voice_id="oi8rgjIfLgJRsQ6rbZh3"),
+        tts=elevenlabs.TTS(),
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
     )
