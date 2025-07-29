@@ -3,16 +3,13 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-starter-python"
+name = "startup-diagnosis-s2s-agent"
 version = "1.0.0"
-description = "Simple voice AI assistant built with LiveKit Agents for Python"
+description = "AI voice agent for conducting automated interviews with startup owners at Link School of Business"
 requires-python = ">=3.9"
 
-dependencies = [
-    "livekit-agents[openai,turn-detector,silero,cartesia,deepgram]~=1.2",
-    "livekit-plugins-noise-cancellation~=0.2.1",
-    "python-dotenv",
-]
+# Dependencies are managed in requirements.txt
+# This allows for more flexible dependency management and easier updates
 
 [dependency-groups]
 dev = [

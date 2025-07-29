@@ -25,6 +25,9 @@ jobs:
     
     - name: Install dependencies
       run: UV_GIT_LFS=1 uv sync --dev
+
+    - name: Install pip dependencies
+      run: pip install -r requirements.txt
         
     - name: Run tests
       env:
