@@ -1,5 +1,4 @@
 import logging
-import os
 from dotenv import load_dotenv
 from livekit.agents import Agent, AgentSession, JobContext, JobProcess, RoomInputOptions, RoomOutputOptions, WorkerOptions, cli, metrics
 from livekit.agents.voice import MetricsCollectedEvent
@@ -19,30 +18,40 @@ def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
 
 async def entrypoint(ctx: JobContext):
-    ctx.log_context_fields = { "room": ctx.room.name }
-    session = AgentSession(
-        llm=openai.LLM(model="gpt-4.1-nano"),
-        stt=openai.STT(model="whisper-1"),
-        tts=elevenlabs.TTS(),
-        turn_detection=MultilingualModel(),
-        vad=ctx.proc.userdata["vad"],
-    )
-    usage_collector = metrics.UsageCollector()
-    @session.on("metrics_collected")
-    def _on_metrics_collected(ev: MetricsCollectedEvent):
-        metrics.log_metrics(ev.metrics)
-        usage_collector.collect(ev.metrics)
-    async def log_usage():
-        summary = usage_collector.get_summary()
-        logger.info(f"Usage: {summary}")
-    ctx.add_shutdown_callback(log_usage) # shutdown callbacks are triggered when the session is over
-    await session.start(
-        agent=Assistant(),
-        room=ctx.room,
-        room_input_options=RoomInputOptions(noise_cancellation=noise_cancellation.BVC()),
-        room_output_options=RoomOutputOptions(transcription_enabled=True),
-    )
-    await ctx.connect()
+    try:
+        ctx.log_context_fields = { "room": ctx.room.name }
+        session = AgentSession(
+            llm=openai.LLM(model="gpt-4.1-nano"),
+            stt=openai.STT(model="whisper-1"),
+            tts=elevenlabs.TTS(),
+            turn_detection=MultilingualModel(),
+            vad=ctx.proc.userdata["vad"],
+        )
+        usage_collector = metrics.UsageCollector()
+        @session.on("metrics_collected")
+        def _on_metrics_collected(ev: MetricsCollectedEvent):
+            try:
+                metrics.log_metrics(ev.metrics)
+                usage_collector.collect(ev.metrics)
+            except Exception as e:
+                logger.warning(f"Error collecting metrics: {e}")
+        async def log_usage():
+            try:
+                summary = usage_collector.get_summary()
+                logger.info(f"Usage: {summary}")
+            except Exception as e:
+                logger.warning(f"Error logging usage: {e}")
+        ctx.add_shutdown_callback(log_usage)
+        await ctx.connect()
+        await session.start(
+            agent=Assistant(),
+            room=ctx.room,
+            room_input_options=RoomInputOptions(noise_cancellation=noise_cancellation.BVC()),
+            room_output_options=RoomOutputOptions(transcription_enabled=True),
+        )
+    except Exception as e:
+        logger.error(f"Error in entrypoint: {e}", exc_info=True)
+        raise
 
 
 if __name__ == "__main__":

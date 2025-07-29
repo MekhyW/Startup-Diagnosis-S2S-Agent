@@ -1,9 +1,8 @@
-livekit-agents[openai, silero, elevenlabs]
-livekit-plugins-noise-cancellation
-livekit-plugins-turn-detector
+livekit-agents[openai,turn-detector,silero,elevenlabs]>=1.2.2
+livekit-plugins-noise-cancellation>=0.2.5
+python-dotenv
 fastapi
 uvicorn
-python-dotenv
 httpx
 ipython
 aiohttp>=3.12
