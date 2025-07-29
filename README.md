@@ -1,30 +1,36 @@
-<a href="https://livekit.io/">
-  <img src="./.github/assets/livekit-mark.png" alt="LiveKit logo" width="100" height="100">
-</a>
+# Startup Diagnosis S2S Agent
 
-# LiveKit Agents Starter - Python
+An AI-powered voice agent backend designed specifically for conducting automated interviews with startup owners who are students at Link School of Business. This system provides intelligent conversation capabilities to gather insights about startup ventures, business models, challenges, and growth opportunities.
 
-A complete starter project for building voice AI apps with [LiveKit Agents for Python](https://github.com/livekit/agents).
+## Purpose
 
-The starter project includes:
+This voice agent serves as an automated interviewer that can:
+- Conduct structured interviews with startup founders
+- Gather comprehensive business insights and diagnostics
+- Analyze startup challenges and opportunities
+- Provide intelligent follow-up questions based on responses
+- Generate valuable data for business education and mentorship
 
-- A simple voice AI assistant based on the [Voice AI quickstart](https://docs.livekit.io/agents/start/voice-ai/)
-- Voice AI pipeline based on [OpenAI](https://docs.livekit.io/agents/integrations/llm/openai/), [Cartesia](https://docs.livekit.io/agents/integrations/tts/cartesia/), and [Deepgram](https://docs.livekit.io/agents/integrations/llm/deepgram/)
-  - Easily integrate your preferred [LLM](https://docs.livekit.io/agents/integrations/llm/), [STT](https://docs.livekit.io/agents/integrations/stt/), and [TTS](https://docs.livekit.io/agents/integrations/tts/) instead, or swap to a realtime model like the [OpenAI Realtime API](https://docs.livekit.io/agents/integrations/realtime/openai)
-- Eval suite based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/)
-- [LiveKit Turn Detector](https://docs.livekit.io/agents/build/turns/turn-detector/) for contextually-aware speaker detection, with multilingual support
-- [LiveKit Cloud enhanced noise cancellation](https://docs.livekit.io/home/cloud/noise-cancellation/)
-- Integrated [metrics and logging](https://docs.livekit.io/agents/build/metrics/)
+## Key Features
 
-This starter app is compatible with any [custom web/mobile frontend](https://docs.livekit.io/agents/start/frontend/) or [SIP-based telephony](https://docs.livekit.io/agents/start/telephony/).
+- **Intelligent Conversation Flow**: AI-driven interview process tailored for startup diagnosis
+- **Voice AI Pipeline**: Built on [OpenAI](https://docs.livekit.io/agents/integrations/llm/openai/), [Cartesia](https://docs.livekit.io/agents/integrations/tts/cartesia/), and [Deepgram](https://docs.livekit.io/agents/integrations/llm/deepgram/) for natural voice interactions
+- **Contextual Understanding**: Advanced turn detection and speaker recognition for smooth conversations
+- **Business-Focused Prompts**: Specialized prompts designed for startup evaluation and diagnosis
+- **Real-time Processing**: Live conversation analysis and adaptive questioning
+- **Comprehensive Logging**: Detailed session recording and analytics for educational insights
+
+This backend is compatible with any [custom web/mobile frontend](https://docs.livekit.io/agents/start/frontend/) or [SIP-based telephony](https://docs.livekit.io/agents/start/telephony/) for flexible deployment options.
+
+Check out the [Frontend Repository](https://github.com/MekhyW/Startup-Diagnosis-S2S-Frontend)
 
 ## Dev Setup
 
-Clone the repository and install dependencies to a virtual environment:
+Clone the repository and install dependencies:
 
 ```console
-cd agent-starter-python
-uv sync
+cd Startup-Diagnosis-S2S-Agent
+pip install -r requirements.txt
 ```
 
 Set up the environment by copying `.env.example` to `.env.local` and filling in the required values:
@@ -34,6 +40,8 @@ Set up the environment by copying `.env.example` to `.env.local` and filling in 
 - `LIVEKIT_API_SECRET`
 - `OPENAI_API_KEY`
 - `ELEVEN_API_KEY`
+
+Ensure you have the `system_prompt.txt` file configured with startup-specific interview prompts.
 
 You can load the LiveKit environment automatically using the [LiveKit CLI](https://docs.livekit.io/home/cli/cli-setup):
 
@@ -46,25 +54,27 @@ lk app env -w .env.local
 Before your first run, you must download certain models such as [Silero VAD](https://docs.livekit.io/agents/build/turns/vad/) and the [LiveKit turn detector](https://docs.livekit.io/agents/build/turns/turn-detector/):
 
 ```console
-uv run python src/agent.py download-files
+python src/agent.py download-files
 ```
 
-Next, run this command to speak to your agent directly in your terminal:
+### Alternative Methods
+
+To speak to your agent directly in your terminal:
 
 ```console
-uv run python src/agent.py console
+python src/agent.py console
 ```
 
-To run the agent for use with a frontend or telephony, use the `dev` command:
+For the standard agent (may experience issues on Windows):
 
 ```console
-uv run python src/agent.py dev
+python src/agent.py dev
 ```
 
 In production, use the `start` command:
 
 ```console
-uv run python src/agent.py start
+python src/agent.py start
 ```
 
 ## Frontend & Telephony
@@ -88,18 +98,23 @@ For advanced customization, see the [complete frontend guide](https://docs.livek
 This project includes a complete suite of evals, based on the LiveKit Agents [testing & evaluation framework](https://docs.livekit.io/agents/build/testing/). To run them, use `pytest`.
 
 ```console
-uv run pytest
+python -m pytest
 ```
 
-## Using this template repo for your own project
+## Startup Interview Configuration
 
-Once you've started your own project based on this repo, you should:
+The agent is specifically configured for startup diagnosis interviews with:
 
-1. **Check in your `uv.lock`**: This file is currently untracked for the template, but you should commit it to your repository for reproducible builds and proper configuration management. (The same applies to `livekit.toml`, if you run your agents in LiveKit Cloud)
-
-2. **Remove the git tracking test**: Delete the "Check files not tracked in git" step from `.github/workflows/tests.yml` since you'll now want this file to be tracked. These are just there for development purposes in the template repo itself.
-
-3. **Add your own repository secrets**: You must [add secrets](https://docs.github.com/en/actions/how-tos/writing-workflows/choosing-what-your-workflow-does/using-secrets-in-github-actions) for `OPENAI_API_KEY` or your other LLM provider so that the tests can run in CI.
+- **Custom System Prompts**: Tailored prompts in `system_prompt.txt` for startup evaluation
+- **Business-Focused Questions**: Structured interview flow covering:
+  - Business model validation
+  - Market analysis and competition
+  - Financial planning and projections
+  - Team composition and skills
+  - Growth strategies and challenges
+  - Technology and product development
+- **Adaptive Questioning**: AI-driven follow-up questions based on responses
+- **Educational Integration**: Designed for Link School of Business curriculum
 
 ## Deploying to production
 
