@@ -40,8 +40,7 @@ Set up the environment by copying `.env.example` to `.env.local` and filling in 
 - `LIVEKIT_API_SECRET`
 - `OPENAI_API_KEY`
 - `ELEVEN_API_KEY`
-
-Ensure you have the `system_prompt.txt` file configured with startup-specific interview prompts.
+- `ENCRYPTION_KEY`
 
 You can load the LiveKit environment automatically using the [LiveKit CLI](https://docs.livekit.io/home/cli/cli-setup):
 
@@ -105,7 +104,7 @@ python -m pytest
 
 The agent is specifically configured for startup diagnosis interviews with:
 
-- **Custom System Prompts**: Tailored prompts in `system_prompt.txt` for startup evaluation
+- **Custom System Prompts**: Tailored prompts for startup evaluation
 - **Business-Focused Questions**: Structured interview flow covering:
   - Business model validation
   - Market analysis and competition

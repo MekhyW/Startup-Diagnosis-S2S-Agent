@@ -4,6 +4,7 @@ from livekit.agents import Agent, AgentSession, JobContext, JobProcess, RoomInpu
 from livekit.agents.voice import MetricsCollectedEvent
 from livekit.plugins import elevenlabs, noise_cancellation, openai, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
+from decrypt import decrypt_system_prompt
 logger = logging.getLogger("agent")
 load_dotenv(".env.local")
 
@@ -12,7 +13,7 @@ with open("system_prompt.txt", "r", encoding='utf-8') as f:
 
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(instructions=system_prompt)
+        super().__init__(instructions=decrypt_system_prompt())
 
 def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()

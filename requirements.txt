@@ -1,6 +1,8 @@
+livekit
 livekit-agents[openai,turn-detector,silero,elevenlabs]>=1.2.2
 livekit-plugins-noise-cancellation>=0.2.5
 livekit-plugins-elevenlabs
+decrypt
 python-dotenv
 fastapi
 uvicorn
