@@ -29,4 +29,9 @@ jobs:
     - name: Run tests
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+        LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+        LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+        ELEVEN_API_KEY: ${{ secrets.ELEVEN_API_KEY }}
+        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       run: uv run pytest -v
