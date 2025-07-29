@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 def decrypt_system_prompt():
-    load_dotenv(".env.local")
+    load_dotenv("../.env.local")
     encryption_key = os.getenv("ENCRYPTION_KEY")
     if not encryption_key:
         raise ValueError("ENCRYPTION_KEY not found in environment variables")
