@@ -3,6 +3,8 @@ from livekit.agents import AgentSession, llm
 from livekit.agents.voice.run_result import mock_tools
 from livekit.plugins import openai
 from agent import Assistant
+from dotenv import load_dotenv
+load_dotenv(".env.local")
 
 def _llm() -> llm.LLM:
     return openai.LLM(model="gpt-4.1-nano")
