@@ -8,9 +8,6 @@ from decrypt import decrypt_system_prompt
 logger = logging.getLogger("agent")
 load_dotenv(".env.local")
 
-with open("system_prompt.txt", "r", encoding='utf-8') as f:
-    system_prompt = f.read()
-
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(instructions=decrypt_system_prompt())
