@@ -20,7 +20,7 @@ spec:
 
       containers:
         - name: startup-diagnosis-agent
-          image: your-docker-repo.com/startup-diagnosis-s2s-agent:latest
+          image: 193732850525.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
 
           # Good for ~30 concurrent 1:1 AI conversations
           resources:

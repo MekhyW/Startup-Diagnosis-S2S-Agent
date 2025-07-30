@@ -103,40 +103,53 @@ The agent is specifically configured for startup diagnosis interviews with:
 
 This project is production-ready and includes a working `Dockerfile`. To deploy it to LiveKit Cloud or another environment, see the [deploying to production](https://docs.livekit.io/agents/ops/deployment/) guide.
 
-## Kubernetes Deployment on Google Cloud
+## Kubernetes Deployment on AWS
 
-This project includes Kubernetes manifests for deploying the agent to a Google Kubernetes Engine (GKE) cluster.
+This project includes Kubernetes manifests for deploying the agent to an Amazon Elastic Kubernetes Service (EKS) cluster.
 
 ### Prerequisites
 
-1. **Google Cloud SDK**: Install and configure the [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
+1. **AWS CLI**: Install and configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 2. **kubectl**: Install [kubectl](https://kubernetes.io/docs/tasks/tools/) for Kubernetes cluster management
-3. **Docker**: Build and push your container image to Google Container Registry or Artifact Registry
-4. **GKE Cluster**: Create a GKE cluster with sufficient resources
+3. **eksctl**: Install [eksctl](https://eksctl.io/installation/) for EKS cluster management
+4. **Docker**: Build and push your container image to Amazon Elastic Container Registry (ECR)
+5. **EKS Cluster**: Create an EKS cluster with sufficient resources
 
-### Step 1: Build and Push Docker Image
+### Step 1: Create ECR Repository and Push Docker Image
 
 ```bash
-# Build the Docker image
-docker build -t gcr.io/YOUR_PROJECT_ID/startup-diagnosis-s2s-agent:latest .
+# Create ECR repository
+aws ecr create-repository --repository-name startup-diagnosis-s2s-agent --region us-east-1
 
-# Push to Google Container Registry
-docker push gcr.io/YOUR_PROJECT_ID/startup-diagnosis-s2s-agent:latest
+# Get login token for ECR
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+
+# Build the Docker image
+docker build -t startup-diagnosis-s2s-agent:latest .
+
+# Tag the image for ECR
+docker tag startup-diagnosis-s2s-agent:latest YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
+
+# Push to Amazon ECR
+docker push YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
 ```
 
-### Step 2: Create GKE Cluster
+### Step 2: Create EKS Cluster
 
 ```bash
-gcloud container clusters create startup-diagnosis-cluster \
-  --zone=us-central1-a \
-  --num-nodes=3 \
-  --machine-type=e2-standard-4 \
-  --enable-autoscaling \
-  --min-nodes=1 \
-  --max-nodes=10
+# Create an EKS cluster using eksctl
+eksctl create cluster \
+  --name startup-diagnosis-cluster \
+  --region us-east-1 \
+  --nodegroup-name startup-diagnosis-nodes \
+  --node-type m5.large \
+  --nodes 3 \
+  --nodes-min 1 \
+  --nodes-max 10 \
+  --managed
 
-# Get cluster credentials
-gcloud container clusters get-credentials startup-diagnosis-cluster --zone=us-central1-a
+# Update kubeconfig to connect to the EKS cluster
+aws eks update-kubeconfig --region us-east-1 --name startup-diagnosis-cluster
 ```
 
 ### Step 3: Create Kubernetes Namespace
@@ -170,7 +183,7 @@ kubectl create secret generic startup-diagnosis-agent-secrets \
 Edit the `agent-manifest.yaml` file and update the image reference:
 
 ```yaml
-image: gcr.io/YOUR_PROJECT_ID/startup-diagnosis-s2s-agent:latest
+image: YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
 ```
 
 ### Step 6: Deploy to Kubernetes
