@@ -1,10 +1,9 @@
 # This sample Dockerfile creates a production-ready container for a LiveKit voice AI agent
 # syntax=docker/dockerfile:1
 
-# Use the official UV Python base image with Python 3.11 on Debian Bookworm
-# UV is a fast Python package manager that provides better performance than pip
+# Use the official Python base image with Python 3.11 on Debian Bookworm
 # We use the slim variant to keep the image size smaller while still having essential tools
-FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+FROM python:3.11-slim-bookworm
 
 # Keeps Python from buffering stdout and stderr to avoid situations where
 # the application crashes without emitting any logs due to buffering.
@@ -49,25 +48,22 @@ RUN chown -R appuser:appuser /home/appuser
 USER appuser
 
 # Create a cache directory for the user
-# This is used by UV and Python for caching packages and bytecode
+# This is used by pip and Python for caching packages and bytecode
 RUN mkdir -p /home/appuser/.cache
 
-# Install Python dependencies using UV's lock file
-# --locked ensures we use exact versions from uv.lock for reproducible builds
-# This creates a virtual environment and installs all dependencies
-# Ensure your uv.lock file is checked in for consistency across environments
-RUN uv sync --locked
+# Install Python dependencies using pip and requirements.txt
+# This ensures reproducible builds with pinned versions
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
 # dependencies at runtime, which improves startup time and reliability
-RUN uv run src/agent.py download-files
+RUN python src/agent.py download-files
 
 # Expose the healthcheck port
 # This allows Docker and orchestration systems to check if the container is healthy
 EXPOSE 8081
 
-# Run the application using UV
-# UV will activate the virtual environment and run the agent
+# Run the application using Python
 # The "start" command tells the worker to connect to LiveKit and begin waiting for jobs
-CMD ["uv", "run", "src/agent.py", "start"]
+CMD ["python", "src/agent.py", "start"]
