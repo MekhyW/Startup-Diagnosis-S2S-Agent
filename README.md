@@ -11,15 +11,6 @@ This voice agent serves as an automated interviewer that can:
 - Provide intelligent follow-up questions based on responses
 - Generate valuable data for business education and mentorship
 
-## Key Features
-
-- **Intelligent Conversation Flow**: AI-driven interview process tailored for startup diagnosis
-- **Voice AI Pipeline**: Built on [OpenAI](https://docs.livekit.io/agents/integrations/llm/openai/), [Cartesia](https://docs.livekit.io/agents/integrations/tts/cartesia/), and [Deepgram](https://docs.livekit.io/agents/integrations/llm/deepgram/) for natural voice interactions
-- **Contextual Understanding**: Advanced turn detection and speaker recognition for smooth conversations
-- **Business-Focused Prompts**: Specialized prompts designed for startup evaluation and diagnosis
-- **Real-time Processing**: Live conversation analysis and adaptive questioning
-- **Comprehensive Logging**: Detailed session recording and analytics for educational insights
-
 This backend is compatible with any [custom web/mobile frontend](https://docs.livekit.io/agents/start/frontend/) or [SIP-based telephony](https://docs.livekit.io/agents/start/telephony/) for flexible deployment options.
 
 Check out the [Frontend Repository](https://github.com/MekhyW/Startup-Diagnosis-S2S-Frontend)
@@ -48,7 +39,7 @@ You can load the LiveKit environment automatically using the [LiveKit CLI](https
 lk app env -w .env.local
 ```
 
-## Run the agent
+## Run the agent in development mode
 
 Before your first run, you must download certain models such as [Silero VAD](https://docs.livekit.io/agents/build/turns/vad/) and the [LiveKit turn detector](https://docs.livekit.io/agents/build/turns/turn-detector/):
 
@@ -101,19 +92,17 @@ The agent is specifically configured for startup diagnosis interviews with:
 
 ## Deploying to production
 
-This project is production-ready and includes a working `Dockerfile`. To deploy it to LiveKit Cloud or another environment, see the [deploying to production](https://docs.livekit.io/agents/ops/deployment/) guide.
+This project is production-ready and includes a working `Dockerfile`. You can deploy it using either AWS Fargate (recommended) or Kubernetes.
 
-## Kubernetes Deployment on AWS
+## AWS Fargate Deployment (Recommended)
 
-This project includes Kubernetes manifests for deploying the agent to an Amazon Elastic Kubernetes Service (EKS) cluster.
+This project includes automated scripts for deploying to AWS ECS with Fargate, providing a serverless container experience.
 
 ### Prerequisites
 
 1. **AWS CLI**: Install and configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-2. **kubectl**: Install [kubectl](https://kubernetes.io/docs/tasks/tools/) for Kubernetes cluster management
-3. **eksctl**: Install [eksctl](https://eksctl.io/installation/) for EKS cluster management
-4. **Docker**: Build and push your container image to Amazon Elastic Container Registry (ECR)
-5. **EKS Cluster**: Create an EKS cluster with sufficient resources
+2. **Docker**: Build and push your container image to Amazon Elastic Container Registry (ECR)
+3. **VPC Configuration**: Ensure you have subnets and security groups configured
 
 ### Step 1: Create ECR Repository and Push Docker Image
 
@@ -134,84 +123,48 @@ docker tag startup-diagnosis-s2s-agent:latest YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.
 docker push YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
 ```
 
-### Step 2: Create EKS Cluster
+### Step 2: Configure Secrets
+
+Use the provided script to create AWS Secrets Manager secrets. First, edit the values in the script:
 
 ```bash
-# Create an EKS cluster using eksctl
-eksctl create cluster \
-  --name startup-diagnosis-cluster \
-  --region us-east-1 \
-  --nodegroup-name startup-diagnosis-nodes \
-  --node-type m5.large \
-  --nodes 3 \
-  --nodes-min 1 \
-  --nodes-max 10 \
-  --managed
+# Edit the script with your actual values
+nano bash/create_secrets.bash
 
-# Update kubeconfig to connect to the EKS cluster
-aws eks update-kubeconfig --region us-east-1 --name startup-diagnosis-cluster
+# Run the script to create secrets
+bash bash/create_secrets.bash
 ```
 
-### Step 3: Create Kubernetes Namespace
+### Step 3: Update ECS Task Definition
+
+Edit the `ecs-task-definition.json` file and update:
+- Replace `YOUR_ACCOUNT_ID` with your AWS account ID
+- Update subnet and security group IDs in the network configuration
+- Adjust resource requirements if needed
+
+### Step 4: Deploy to ECS Fargate
+
+Use the provided deployment script:
 
 ```bash
-kubectl create namespace livekit
+# Edit the script to update subnet and security group IDs
+nano bash/deploy.sh
+
+# Run the deployment script
+bash bash/deploy.sh
 ```
 
-### Step 4: Configure Secrets
-
-Before deploying, you need to create Kubernetes secrets with your API keys and configuration:
+### Step 5: Monitor Deployment
 
 ```bash
-# Create LiveKit secrets
-kubectl create secret generic startup-diagnosis-agent-livekit \
-  --from-literal=LIVEKIT_URL="your-livekit-url" \
-  --from-literal=LIVEKIT_API_KEY="your-livekit-api-key" \
-  --from-literal=LIVEKIT_API_SECRET="your-livekit-api-secret" \
-  --namespace=livekit
-
-# Create application secrets
-kubectl create secret generic startup-diagnosis-agent-secrets \
-  --from-literal=OPENAI_API_KEY="your-openai-api-key" \
-  --from-literal=ELEVEN_API_KEY="your-eleven-api-key" \
-  --from-literal=ENCRYPTION_KEY="your-encryption-key" \
-  --namespace=livekit
-```
-
-### Step 5: Update Deployment Manifest
-
-Edit the `agent-manifest.yaml` file and update the image reference:
-
-```yaml
-image: YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
-```
-
-### Step 6: Deploy to Kubernetes
-
-```bash
-# Apply the deployment manifest
-kubectl apply -f agent-manifest.yaml
-
-# Check deployment status
-kubectl get deployments -n livekit
-kubectl get pods -n livekit
+# Check service status
+aws ecs describe-services --cluster startup-diagnosis-cluster --services startup-diagnosis-service
 
 # View logs
-kubectl logs -f deployment/startup-diagnosis-agent -n livekit
-```
+aws logs tail /ecs/startup-diagnosis-agent --follow
 
-### Step 7: Scaling and Monitoring
-
-```bash
-# Scale the deployment
-kubectl scale deployment startup-diagnosis-agent --replicas=3 -n livekit
-
-# Monitor resource usage
-kubectl top pods -n livekit
-kubectl top nodes
-
-# Set up horizontal pod autoscaling
-kubectl autoscale deployment startup-diagnosis-agent --cpu-percent=70 --min=1 --max=10 -n livekit
+# Scale the service
+aws ecs update-service --cluster startup-diagnosis-cluster --service startup-diagnosis-service --desired-count 3
 ```
 
 ## License
