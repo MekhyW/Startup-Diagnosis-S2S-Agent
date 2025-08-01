@@ -4,12 +4,12 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "4096",
   "memory": "8192",
-  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskRole",
   "containerDefinitions": [
     {
       "name": "startup-diagnosis-agent",
-      "image": "193732850525.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest",
+      "image": "YOUR_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/startup-diagnosis-s2s-agent:latest",
       "essential": true,
       "portMappings": [
         {
@@ -21,34 +21,34 @@
       "secrets": [
         {
           "name": "LIVEKIT_URL",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:YOUR_ACCOUNT:secret:startup-diagnosis/livekit:LIVEKIT_URL::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/livekit:LIVEKIT_URL::"
         },
         {
           "name": "LIVEKIT_API_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:YOUR_ACCOUNT:secret:startup-diagnosis/livekit:LIVEKIT_API_KEY::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/livekit:LIVEKIT_API_KEY::"
         },
         {
           "name": "LIVEKIT_API_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:YOUR_ACCOUNT:secret:startup-diagnosis/livekit:LIVEKIT_API_SECRET::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/livekit:LIVEKIT_API_SECRET::"
         },
         {
           "name": "OPENAI_API_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:YOUR_ACCOUNT:secret:startup-diagnosis/app:OPENAI_API_KEY::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:OPENAI_API_KEY::"
         },
         {
           "name": "ELEVEN_API_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:YOUR_ACCOUNT:secret:startup-diagnosis/app:ELEVEN_API_KEY::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:ELEVEN_API_KEY::"
         },
         {
           "name": "ENCRYPTION_KEY",
-          "valueFrom": "arn:aws:secretsmanager:us-east-1:YOUR_ACCOUNT:secret:startup-diagnosis/app:ENCRYPTION_KEY::"
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:ENCRYPTION_KEY::"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/startup-diagnosis-agent",
-          "awslogs-region": "us-east-1",
+          "awslogs-region": "us-east-2",
           "awslogs-stream-prefix": "ecs"
         }
       }

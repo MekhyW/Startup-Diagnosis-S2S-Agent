@@ -2,7 +2,8 @@
 aws ecs register-task-definition --cli-input-json file://ecs-task-definition.json
 
 # Create ECS cluster
-aws ecs create-cluster --cluster-name startup-diagnosis-cluster --capacity-providers FARGATE
+aws ecs create-cluster --cluster-name startup-diagnosis-cluster
+aws ecs put-cluster-capacity-providers --cluster startup-diagnosis-cluster --capacity-providers FARGATE --default-capacity-provider-strategy capacityProvider=FARGATE,weight=1 
 
 # Create service
 aws ecs create-service \
@@ -11,4 +12,4 @@ aws ecs create-service \
   --task-definition startup-diagnosis-agent:1 \
   --desired-count 1 \
   --launch-type FARGATE \
-  --network-configuration "awsvpcConfiguration={subnets=[subnet-12345,subnet-67890],securityGroups=[sg-12345],assignPublicIp=ENABLED}"
+  --network-configuration "awsvpcConfiguration={subnets=[subnet-0e3d8d587027318f6,subnet-0e420769b610bf125],securityGroups=[sg-07e269e98958c89ca],assignPublicIp=ENABLED}"

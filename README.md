@@ -108,19 +108,19 @@ This project includes automated scripts for deploying to AWS ECS with Fargate, p
 
 ```bash
 # Create ECR repository
-aws ecr create-repository --repository-name startup-diagnosis-s2s-agent --region us-east-1
+aws ecr create-repository --repository-name startup-diagnosis-s2s-agent --region us-east-2
 
 # Get login token for ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin YOUR_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com
 
 # Build the Docker image
 docker build -t startup-diagnosis-s2s-agent:latest .
 
 # Tag the image for ECR
-docker tag startup-diagnosis-s2s-agent:latest YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
+docker tag startup-diagnosis-s2s-agent:latest YOUR_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/startup-diagnosis-s2s-agent:latest
 
 # Push to Amazon ECR
-docker push YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/startup-diagnosis-s2s-agent:latest
+docker push YOUR_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/startup-diagnosis-s2s-agent:latest
 ```
 
 ### Step 2: Configure Secrets
