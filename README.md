@@ -147,6 +147,9 @@ Edit the `ecs-task-definition.json` file and update:
 Use the provided deployment script:
 
 ```bash
+# Create required log group and IAM roles
+bash bash/create_resources.bash
+
 # Edit the script to update subnet and security group IDs
 nano bash/deploy.sh
 
