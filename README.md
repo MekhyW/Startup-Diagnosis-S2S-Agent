@@ -142,6 +142,8 @@ Edit the `ecs-task-definition.json` file and update:
 - Update subnet and security group IDs in the network configuration
 - Adjust resource requirements if needed
 
+Make sure your account and the ECS task definition have the necessary permissions to access the secrets!
+
 ### Step 4: Deploy to ECS Fargate
 
 Use the provided deployment script:
