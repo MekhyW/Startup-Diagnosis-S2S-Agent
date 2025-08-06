@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Link Startup Interview Result",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "interview_id": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "interviewer": { "type": "string" },
+        "confidence_overall": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "required": ["interview_id", "date"]
+    },
+    "startup_info": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "revenue_last_12m": { "type": "number" },
+        "customers": { "type": "integer" },
+        "time_operating_months": { "type": "integer" },
+        "main_challenge": { "type": "string" }
+      },
+      "required": ["name", "revenue_last_12m", "customers", "time_operating_months"]
+    },
+    "areas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "area_name": {
+            "type": "string",
+            "enum": ["Vendas", "Marketing", "Operações", "Produto", "Tecnologia", "Financeiro", "Legal", "Time"]
+          },
+          "score": { "type": "number", "minimum": 1, "maximum": 10 },
+          "faixa": { "type": "integer", "minimum": 1, "maximum": 9 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evidences": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "gaps": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "strengths": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["area_name", "score", "faixa", "confidence"]
+      }
+    },
+    "final_classification": {
+      "type": "object",
+      "properties": {
+        "group": { "type": "string", "enum": ["Bronze", "Prata", "Ouro", "Diamante"] },
+        "faixa": { "type": "integer", "minimum": 1, "maximum": 9 },
+        "overall_score": { "type": "number", "minimum": 0, "maximum": 10 },
+        "momentum": { "type": "string", "enum": ["Positivo", "Estável", "Desafiador"] }
+      },
+      "required": ["group", "faixa", "overall_score"]
+    },
+    "insights": {
+      "type": "object",
+      "properties": {
+        "key_strengths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "critical_gaps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "next_steps": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "required": ["metadata", "startup_info", "areas", "final_classification"]
+}

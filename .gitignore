@@ -11,3 +11,4 @@ KMS
 .pytest_cache
 .ruff_cache
 system_prompt.txt
+*.pdf
