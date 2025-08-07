@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import uuid
 from datetime import datetime
@@ -63,20 +64,24 @@ async def entrypoint(ctx: JobContext):
                 usage_collector.collect(ev.metrics)
             except Exception as e:
                 logger.warning(f"Error collecting metrics: {e}")
-        
+
         @session.on("user_speech_committed")
-        async def _on_user_speech_committed(message):
-            try:
-                await assistant.on_user_speech_committed(message)
-            except Exception as e:
-                logger.warning(f"Error handling user speech: {e}")
+        def _on_user_speech_committed(message):
+            async def handle_user_speech():
+                try:
+                    await assistant.on_user_speech_committed(message)
+                except Exception as e:
+                    logger.warning(f"Error handling user speech: {e}")
+            asyncio.create_task(handle_user_speech())
         
         @session.on("agent_speech_committed")
-        async def _on_agent_speech_committed(message):
-            try:
-                await assistant.on_agent_speech_committed(message)
-            except Exception as e:
-                logger.warning(f"Error handling agent speech: {e}")
+        def _on_agent_speech_committed(message):
+            async def handle_agent_speech():
+                try:
+                    await assistant.on_agent_speech_committed(message)
+                except Exception as e:
+                    logger.warning(f"Error handling agent speech: {e}")
+            asyncio.create_task(handle_agent_speech())
         
         async def process_interview_completion():
             """Process interview completion: generate report and upload to S3"""
