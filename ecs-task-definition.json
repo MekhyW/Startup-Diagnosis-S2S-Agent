@@ -42,6 +42,18 @@
         {
           "name": "ENCRYPTION_KEY",
           "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:ENCRYPTION_KEY::"
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:AWS_ACCESS_KEY_ID::"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:AWS_SECRET_ACCESS_KEY::"
+        },
+        {
+          "name": "S3_BUCKET_NAME",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:S3_BUCKET_NAME::"
         }
       ],
       "logConfiguration": {

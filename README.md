@@ -32,6 +32,9 @@ Set up the environment by copying `.env.example` to `.env.local` and filling in 
 - `OPENAI_API_KEY`
 - `ELEVEN_API_KEY`
 - `ENCRYPTION_KEY`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `S3_BUCKET_NAME`
 
 You can load the LiveKit environment automatically using the [LiveKit CLI](https://docs.livekit.io/home/cli/cli-setup):
 
