@@ -1,8 +1,3 @@
-# This sample Dockerfile creates a production-ready container for a LiveKit voice AI agent
-# syntax=docker/dockerfile:1
-
-# Use the official Python base image with Python 3.11 on Debian Bookworm
-# We use the slim variant to keep the image size smaller while still having essential tools
 FROM python:3.11-slim-bookworm
 
 # Keeps Python from buffering stdout and stderr to avoid situations where
