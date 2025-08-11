@@ -48,7 +48,7 @@ Schema:
             chat_ctx = ChatContext()
             chat_ctx.add_message(content="Você é um consultor especialista em análise de startups e deve gerar um relatório estruturado baseado na entrevista transcrita.", role="system")
             chat_ctx.add_message(content=prompt, role="user")
-            stream = self.llm.chat(chat_ctx=chat_ctx, temperature=0.3)
+            stream = self.llm.chat(chat_ctx=chat_ctx)
             report_text = ""
             async for chunk in stream:
                 if chunk.choices and chunk.choices[0].delta.content:
