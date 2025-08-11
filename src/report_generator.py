@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 import jsonschema
 from livekit.plugins import openai
-from livekit.agents.llm import ChatContext, ChatMessage
+from livekit.agents.llm import ChatContext
 
 logger = logging.getLogger("report_generator")
 
@@ -46,8 +46,8 @@ Schema:
             prompt = self._get_report_prompt(transcription)
             logger.info("Generating report from transcription...")
             chat_ctx = ChatContext()
-            chat_ctx.messages.append(ChatMessage.create(text="Você é um consultor especialista em análise de startups e deve gerar um relatório estruturado baseado na entrevista transcrita.", role="system"))
-            chat_ctx.messages.append(ChatMessage.create(text=prompt, role="user"))
+            chat_ctx.add_message(content="Você é um consultor especialista em análise de startups e deve gerar um relatório estruturado baseado na entrevista transcrita.", role="system")
+            chat_ctx.add_message(content=prompt, role="user")
             stream = self.llm.chat(chat_ctx=chat_ctx, temperature=0.3)
             report_text = ""
             async for chunk in stream:
