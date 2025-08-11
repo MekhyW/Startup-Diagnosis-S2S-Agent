@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 import jsonschema
 from livekit.plugins import openai
-from livekit.agents.llm import ChatMessage, ChatRole
+from livekit.agents.llm import ChatContext, ChatMessage
 
 logger = logging.getLogger("report_generator")
 
@@ -25,8 +25,6 @@ class ReportGenerator:
     def _get_report_prompt(self, transcription: str) -> str:
         """Generate the prompt for report generation"""
         return f"""
-Você é um consultor especialista em análise de startups e deve gerar um relatório estruturado baseado na entrevista transcrita abaixo.
-
 TRANSCRIÇÃO DA ENTREVISTA:
 {transcription}
 
@@ -47,18 +45,14 @@ Schema:
         try:
             prompt = self._get_report_prompt(transcription)
             logger.info("Generating report from transcription...")
-            messages = [
-                ChatMessage(
-                    role=ChatRole.SYSTEM,
-                    content="Você é um especialista em análise de startups. Gere relatórios estruturados em JSON seguindo exatamente o schema fornecido."
-                ),
-                ChatMessage(
-                    role=ChatRole.USER,
-                    content=prompt
-                )
-            ]
-            response = await self.llm.achat(messages=messages, temperature=0.3, max_tokens=4000)
-            report_text = response.choices[0].message.content.strip()
+            chat_ctx = ChatContext()
+            chat_ctx.messages.append(ChatMessage.create(text="Você é um consultor especialista em análise de startups e deve gerar um relatório estruturado baseado na entrevista transcrita.", role="system"))
+            chat_ctx.messages.append(ChatMessage.create(text=prompt, role="user"))
+            stream = self.llm.chat(chat_ctx=chat_ctx, temperature=0.3)
+            report_text = ""
+            async for chunk in stream:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    report_text += chunk.choices[0].delta.content
             try:
                 if report_text.startswith("```json"): # Remove any markdown formatting if present
                     report_text = report_text[7:]
@@ -68,7 +62,6 @@ Schema:
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse JSON response: {e}")
                 logger.error(f"Response text: {report_text[:500]}...")
-                return None
             if "metadata" not in report_data:
                 report_data["metadata"] = {}
             report_data["metadata"]["interview_id"] = interview_id
