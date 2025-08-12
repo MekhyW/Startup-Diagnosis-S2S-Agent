@@ -34,6 +34,19 @@ INSTRUÇÕES:
 3. Preencha todos os campos do schema
 4. Forneça insights sobre pontos fortes, lacunas críticas e próximos passos
 
+PARA CÁLCULO DE SCORE DA ÁREA:
+Baseado em evidências de maturidade e capacidades demonstradas:
+Faixa 1-2: Processos informais, aprendizado inicial, dependência total de founders
+Faixa 3-4: Sistemas básicos implementados, processos documentados, métricas iniciais
+Faixa 5-6: Automação, especialização, operações independentes dos founders
+Faixa 7-8: Operações avançadas, multi-canal/região, otimização contínua
+Faixa 9: Liderança de categoria, benchmark da indústria, inovação
+
+PARA CÁLCULO DE CONFIANÇA:
+Evidências específicas (números, métricas, ferramentas, processos): +40%
+Consistência narrativa (coerência lógica da resposta): +40%
+Exemplos concretos e detalhamento: +20%
+
 FORMATO DE RESPOSTA:
 Retorne APENAS um JSON válido seguindo exatamente o seguinte schema fornecido. Não inclua texto adicional antes ou depois do JSON.
 Schema:
