@@ -51,8 +51,8 @@ Schema:
             stream = self.llm.chat(chat_ctx=chat_ctx)
             report_text = ""
             async for chunk in stream:
-                if chunk.choices and chunk.choices[0].delta.content:
-                    report_text += chunk.choices[0].delta.content
+                if chunk.delta and chunk.delta.content:
+                    report_text += chunk.delta.content
             try:
                 if report_text.startswith("```json"): # Remove any markdown formatting if present
                     report_text = report_text[7:]
