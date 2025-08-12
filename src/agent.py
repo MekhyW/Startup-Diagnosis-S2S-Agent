@@ -24,12 +24,20 @@ class Assistant(Agent):
         """Called when user speech is committed to transcription"""
         if hasattr(message, 'content') and message.content:
             await self.transcription_manager.add_user_message(message.content)
+        elif hasattr(message, 'user_transcript') and message.user_transcript:
+            await self.transcription_manager.add_user_message(message.user_transcript)
+        else:
+            await self.transcription_manager.add_user_message(message)
     
     async def on_agent_speech_committed(self, message):
         """Called when agent speech is committed"""
         if hasattr(message, 'content') and message.content:
             await self.transcription_manager.add_agent_message(message.content)
-    
+        elif hasattr(message, 'agent_transcript') and message.agent_transcript:
+            await self.transcription_manager.add_agent_message(message.agent_transcript)
+        else:
+            await self.transcription_manager.add_agent_message(message)
+
     async def mark_interview_complete(self):
         """Mark the interview as completed"""
         self.interview_completed = True
