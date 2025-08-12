@@ -89,17 +89,21 @@ async def entrypoint(ctx: JobContext):
                 logger.info("Processing interview completion...")
                 full_transcription = await transcription_manager.get_full_transcription()
                 conversation_only = await transcription_manager.get_conversation_only()
+                logger.info("Uploading full transcription to S3...")
+                transcription_key = await s3_handler.upload_transcription(interview_id, full_transcription)
+                if transcription_key:
+                    logger.info(f"Transcription uploaded to S3: {transcription_key}")
+                else:
+                    logger.error("Failed to upload transcription to S3")
                 logger.info("Generating structured report...")
                 report_data = await report_generator.generate_report(conversation_only, interview_id)
                 if report_data:
-                    logger.info("Uploading to S3...")
-                    upload_results = await s3_handler.upload_both(interview_id, full_transcription, report_data)
-                    if upload_results['transcription_key'] and upload_results['report_key']:
-                        logger.info(f"Successfully uploaded interview data:")
-                        logger.info(f"  Transcription: {upload_results['transcription_key']}")
-                        logger.info(f"  Report: {upload_results['report_key']}")
+                    logger.info("Uploading report to S3...")
+                    report_key = await s3_handler.upload_report(interview_id, report_data)
+                    if report_key:
+                        logger.info(f"Report uploaded to S3: {report_key}")
                     else:
-                        logger.error("Failed to upload some files to S3")
+                        logger.error("Failed to upload report to S3")
                 else:
                     logger.error("Failed to generate report")
             except Exception as e:

@@ -58,12 +58,3 @@ class S3Handler:
         except ClientError as e:
             logger.error(f"Failed to upload report: {e}")
             return None
-    
-    async def upload_both(self, interview_id: str, transcription: str, report_data: Dict[str, Any]) -> Dict[str, Optional[str]]:
-        """ Upload both transcription and report to S3 """
-        transcription_key = await self.upload_transcription(interview_id, transcription)
-        report_key = await self.upload_report(interview_id, report_data)
-        return {
-            'transcription_key': transcription_key,
-            'report_key': report_key
-        }
