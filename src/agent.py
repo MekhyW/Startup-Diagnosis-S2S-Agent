@@ -3,9 +3,11 @@ import logging
 import uuid
 from datetime import datetime
 from dotenv import load_dotenv
-from livekit.agents import Agent, AgentSession, JobContext, JobProcess, RoomInputOptions, RoomOutputOptions, WorkerOptions, cli, metrics
+from livekit.agents import Agent, AgentSession, JobContext, JobProcess, RoomInputOptions, RoomOutputOptions, WorkerOptions, metrics, cli
 from livekit.agents.voice import MetricsCollectedEvent
-from livekit.plugins import elevenlabs, noise_cancellation, openai, silero
+from livekit.agents import ConversationItemAddedEvent
+from livekit.agents.llm import ImageContent, AudioContent
+from livekit.plugins import elevenlabs, openai, silero, noise_cancellation
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from decrypt import decrypt_system_prompt
 from transcription_manager import TranscriptionManager
@@ -20,23 +22,12 @@ class Assistant(Agent):
         self.transcription_manager = transcription_manager
         self.interview_completed = False
     
-    async def on_user_speech_committed(self, message):
-        """Called when user speech is committed to transcription"""
-        if hasattr(message, 'content') and message.content:
-            await self.transcription_manager.add_user_message(message.content)
-        elif hasattr(message, 'user_transcript') and message.user_transcript:
-            await self.transcription_manager.add_user_message(message.user_transcript)
+    async def add_message(self, role, message):
+        """Called when conversation item is added"""
+        if 'assistant' in role:
+            await self.transcription_manager.add_agent_message(message)
         else:
             await self.transcription_manager.add_user_message(message)
-    
-    async def on_agent_speech_committed(self, message):
-        """Called when agent speech is committed"""
-        if hasattr(message, 'content') and message.content:
-            await self.transcription_manager.add_agent_message(message.content)
-        elif hasattr(message, 'agent_transcript') and message.agent_transcript:
-            await self.transcription_manager.add_agent_message(message.agent_transcript)
-        else:
-            await self.transcription_manager.add_agent_message(message)
 
     async def mark_interview_complete(self):
         """Mark the interview as completed"""
@@ -72,24 +63,23 @@ async def entrypoint(ctx: JobContext):
                 usage_collector.collect(ev.metrics)
             except Exception as e:
                 logger.warning(f"Error collecting metrics: {e}")
-
-        @session.on("user_speech_committed")
-        def _on_user_speech_committed(message):
-            async def handle_user_speech():
-                try:
-                    await assistant.on_user_speech_committed(message)
-                except Exception as e:
-                    logger.warning(f"Error handling user speech: {e}")
-            asyncio.create_task(handle_user_speech())
         
-        @session.on("agent_speech_committed")
-        def _on_agent_speech_committed(message):
-            async def handle_agent_speech():
+        @session.on("conversation_item_added")
+        def _on_conversation_item_added(event: ConversationItemAddedEvent):
+            async def handle_conversation_item_added():
                 try:
-                    await assistant.on_agent_speech_committed(message)
+                    for content in event.item.content:
+                        if isinstance(content, str):
+                            if event.item.interrupted:
+                                content += " [INTERRUPTED]"
+                            await assistant.add_message(event.item.role, content)
+                        elif isinstance(content, ImageContent):
+                            print(f" - image: {content.image}") # image is either a rtc.VideoFrame or URL to the image
+                        elif isinstance(content, AudioContent):
+                            print(f" - audio: {content.frame}, transcript: {content.transcript}") # frame is a list[rtc.AudioFrame]
                 except Exception as e:
                     logger.warning(f"Error handling agent speech: {e}")
-            asyncio.create_task(handle_agent_speech())
+            asyncio.create_task(handle_conversation_item_added())
         
         async def process_interview_completion():
             """Process interview completion: generate report and upload to S3"""
