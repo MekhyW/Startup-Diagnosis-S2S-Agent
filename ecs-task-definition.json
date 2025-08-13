@@ -36,6 +36,10 @@
           "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:OPENAI_API_KEY::"
         },
         {
+          "name": "GOOGLE_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:GOOGLE_API_KEY::"
+        },
+        {
           "name": "ELEVEN_API_KEY",
           "valueFrom": "arn:aws:secretsmanager:us-east-2:YOUR_ACCOUNT_ID:secret:startup-diagnosis/app:ELEVEN_API_KEY::"
         },

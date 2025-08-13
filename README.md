@@ -24,17 +24,7 @@ cd Startup-Diagnosis-S2S-Agent
 pip install -r requirements.txt
 ```
 
-Set up the environment by copying `.env.example` to `.env.local` and filling in the required values:
-
-- `LIVEKIT_URL`: Use [LiveKit Cloud](https://cloud.livekit.io/) or [run your own](https://docs.livekit.io/home/self-hosting/)
-- `LIVEKIT_API_KEY`
-- `LIVEKIT_API_SECRET`
-- `OPENAI_API_KEY`
-- `ELEVEN_API_KEY`
-- `ENCRYPTION_KEY`
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `S3_BUCKET_NAME`
+Set up the environment by copying `.env.example` to `.env.local` and filling in the required values.
 
 You can load the LiveKit environment automatically using the [LiveKit CLI](https://docs.livekit.io/home/cli/cli-setup):
 

@@ -7,7 +7,7 @@ from livekit.agents import Agent, AgentSession, JobContext, JobProcess, RoomInpu
 from livekit.agents.voice import MetricsCollectedEvent
 from livekit.agents import ConversationItemAddedEvent
 from livekit.agents.llm import ImageContent, AudioContent
-from livekit.plugins import elevenlabs, openai, silero, noise_cancellation
+from livekit.plugins import elevenlabs, openai, google, silero, noise_cancellation
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from decrypt import decrypt_system_prompt
 from transcription_manager import TranscriptionManager
@@ -47,8 +47,8 @@ async def entrypoint(ctx: JobContext):
         ctx.log_context_fields = { "room": ctx.room.name, "interview_id": interview_id }
         await transcription_manager.start_recording()
         session = AgentSession(
-            llm=openai.LLM(model="gpt-4.1-nano"),
-            stt=openai.STT(model="whisper-1"),
+            llm=google.LLM(model="gemini-2.5-pro", temperature=0.3),
+            stt=openai.STT(model="whisper-1", language="pt"),
             tts=elevenlabs.TTS(),
             turn_detection=MultilingualModel(),
             vad=ctx.proc.userdata["vad"],
@@ -71,7 +71,7 @@ async def entrypoint(ctx: JobContext):
                     for content in event.item.content:
                         if isinstance(content, str):
                             if event.item.interrupted:
-                                content += " [INTERRUPTED]"
+                                content += " [INTERROMPIDO]"
                             await assistant.add_message(event.item.role, content)
                         elif isinstance(content, ImageContent):
                             print(f" - image: {content.image}") # image is either a rtc.VideoFrame or URL to the image
