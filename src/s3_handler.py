@@ -31,7 +31,8 @@ class S3Handler:
                 Bucket=self.bucket_name,
                 Key=s3_key,
                 Body=transcription.encode('utf-8'),
-                ContentType='text/plain',
+                ContentType='text/plain; charset=utf-8',
+                ContentEncoding='utf-8',
                 Metadata={'interview_id': interview_id, 'upload_timestamp': timestamp, 'content_type': 'transcription'}
             )
             logger.info(f"Transcription uploaded successfully: {s3_key}")
@@ -50,7 +51,8 @@ class S3Handler:
                 Bucket=self.bucket_name,
                 Key=s3_key,
                 Body=json_content.encode('utf-8'),
-                ContentType='application/json',
+                ContentType='application/json; charset=utf-8',
+                ContentEncoding='utf-8',
                 Metadata={'interview_id': interview_id, 'upload_timestamp': timestamp, 'content_type': 'report', 'schema_version': '1.0'}
             )
             logger.info(f"Report uploaded successfully: {s3_key}")
