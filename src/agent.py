@@ -3,9 +3,8 @@ import logging
 import uuid
 from datetime import datetime
 from dotenv import load_dotenv
-from livekit.agents import Agent, AgentSession, JobContext, JobProcess, RoomInputOptions, RoomOutputOptions, WorkerOptions, metrics, cli
+from livekit.agents import metrics, cli, Agent, AgentSession, JobContext, JobProcess, RoomInputOptions, RoomOutputOptions, WorkerOptions, ConversationItemAddedEvent, function_tool, RunContext
 from livekit.agents.voice import MetricsCollectedEvent
-from livekit.agents import ConversationItemAddedEvent
 from livekit.agents.llm import ImageContent, AudioContent
 from livekit.plugins import elevenlabs, openai, google, silero, noise_cancellation
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
@@ -35,6 +34,14 @@ class Assistant(Agent):
         await self.transcription_manager.stop_recording()
         logger.info("Interview marked as complete")
 
+    @function_tool()
+    async def end_interview(self, context: RunContext):
+        """Ends the interview.
+        Use this function when all required information has been obtained, or when the user requests to end the interview.
+        This function will stop the recording, generate the report, and upload it to S3.
+        """
+        await self.mark_interview_complete()
+
 def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
 
@@ -52,6 +59,8 @@ async def entrypoint(ctx: JobContext):
             tts=elevenlabs.TTS(),
             turn_detection=MultilingualModel(),
             vad=ctx.proc.userdata["vad"],
+            allow_interruptions=True,
+            preemptive_generation=True
         )
         assistant = Assistant(transcription_manager)
         usage_collector = metrics.UsageCollector()
@@ -68,6 +77,9 @@ async def entrypoint(ctx: JobContext):
         def _on_conversation_item_added(event: ConversationItemAddedEvent):
             async def handle_conversation_item_added():
                 try:
+                    if assistant.interview_completed:
+                        await session.say("Com isso vou encerrar a entrevista. Muito obrigado pela sua participação!")
+                        await session.aclose()
                     for content in event.item.content:
                         if isinstance(content, str):
                             if event.item.interrupted:
@@ -78,7 +90,7 @@ async def entrypoint(ctx: JobContext):
                         elif isinstance(content, AudioContent):
                             print(f" - audio: {content.frame}, transcript: {content.transcript}") # frame is a list[rtc.AudioFrame]
                 except Exception as e:
-                    logger.warning(f"Error handling agent speech: {e}")
+                    logger.warning(f"Error handling conversation item: {e}")
             asyncio.create_task(handle_conversation_item_added())
         
         async def process_interview_completion():
