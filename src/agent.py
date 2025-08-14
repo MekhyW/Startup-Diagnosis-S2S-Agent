@@ -47,7 +47,7 @@ async def entrypoint(ctx: JobContext):
         ctx.log_context_fields = { "room": ctx.room.name, "interview_id": interview_id }
         await transcription_manager.start_recording()
         session = AgentSession(
-            llm=google.LLM(model="gemini-2.5-pro", temperature=0.3),
+            llm=google.LLM(model="gemini-2.0-flash", temperature=0.3),
             stt=openai.STT(model="whisper-1", language="pt"),
             tts=elevenlabs.TTS(),
             turn_detection=MultilingualModel(),
