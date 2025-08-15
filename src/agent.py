@@ -56,7 +56,7 @@ async def entrypoint(ctx: JobContext):
         session = AgentSession(
             llm=google.LLM(model="gemini-2.0-flash", temperature=0.3),
             stt=openai.STT(model="whisper-1", language="pt"),
-            tts=elevenlabs.TTS(),
+            tts=elevenlabs.TTS(voice_id="ODq5zmih8GrVes37Dizd", model="eleven_multilingual_v2"),
             turn_detection=MultilingualModel(),
             vad=ctx.proc.userdata["vad"],
             allow_interruptions=True,
