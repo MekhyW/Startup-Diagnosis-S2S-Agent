@@ -78,7 +78,7 @@ async def entrypoint(ctx: JobContext):
             async def handle_conversation_item_added():
                 try:
                     if assistant.interview_completed:
-                        await session.say("Com isso vou encerrar a entrevista. Muito obrigado pela sua participação!")
+                        await session.say("Com isso vou encerrar a entrevista. Muito obrigado pela sua participação! Você já pode encerrar a chamada.")
                         await session.aclose()
                     for content in event.item.content:
                         if isinstance(content, str):
