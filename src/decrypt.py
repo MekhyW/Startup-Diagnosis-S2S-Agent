@@ -61,3 +61,9 @@ def decrypt_system_prompt():
     except Exception as e:
         print(f"Decryption failed: {e}")
         return None
+
+if __name__ == "__main__":
+    decrypted_prompt = decrypt_system_prompt()
+    if decrypted_prompt:
+        print("Decrypted System Prompt:")
+        print(decrypted_prompt)
