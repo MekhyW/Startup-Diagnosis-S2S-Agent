@@ -60,7 +60,7 @@ async def entrypoint(ctx: JobContext):
             turn_detection=MultilingualModel(),
             vad=ctx.proc.userdata["vad"],
             allow_interruptions=True,
-            preemptive_generation=True
+            preemptive_generation=False
         )
         assistant = Assistant(transcription_manager)
         usage_collector = metrics.UsageCollector()
